@@ -126,7 +126,7 @@ public class InstallController extends BaseController{
 		article.setArticleContent(MDTool.markdown2Html(article.getArticleContentMd()));
 		article.setArticleNewstime(DateUtil.date());
 		article.setArticleStatus(ArticleStatus.PUBLISH.getStatus());
-		article.setArticleSummary("欢迎使用Mayday进行创作，删除这篇文章后赶紧开始吧。");
+		article.setArticleSummary("欢迎使用Vlog进行创作，删除这篇文章后赶紧开始吧。");
 		article.setArticleThumbnail("/static/img/rand/" + RandomUtil.randomInt(1, 19) + ".jpg");
 		article.setArticleType(ThemeStatus.THEME_NOT_ENABLED.getValue());
 		article.setArticlePost(PostType.POST_TYPE_POST.getValue());
