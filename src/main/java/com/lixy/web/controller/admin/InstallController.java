@@ -120,9 +120,9 @@ public class InstallController extends BaseController{
 		
 		//第一篇文章
 		Article article=new Article();
-		article.setArticleTitle("Hello Mayday!");
-		article.setArticleContentMd("# Hello Mayday!\n" +
-                    "欢迎使用Mayday进行创作，删除这篇文章后赶紧开始吧。");
+		article.setArticleTitle("Hello Vlog!");
+		article.setArticleContentMd("# Hello Vlog!\n" +
+                    "欢迎使用Vlog进行创作，删除这篇文章后赶紧开始吧。");
 		article.setArticleContent(MDTool.markdown2Html(article.getArticleContentMd()));
 		article.setArticleNewstime(DateUtil.date());
 		article.setArticleStatus(ArticleStatus.PUBLISH.getStatus());
@@ -132,7 +132,7 @@ public class InstallController extends BaseController{
 		article.setArticlePost(PostType.POST_TYPE_POST.getValue());
 		article.setArticleComment(ThemeStatus.THEME_NOT_ENABLED.getValue());
 		article.setArticleUpdatetime(DateUtil.date());
-		article.setArticleUrl("hello-mayday");
+		article.setArticleUrl("hello-Vlog");
 		//设置当前用户
 		article.setUserId(user.getUserId());
 		articleService.save(article, null, null);
