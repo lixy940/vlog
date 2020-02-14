@@ -1,0 +1,123 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper
+	namespace="com.lixy.mapper.custom.ArticleMapperCustom">
+	<sql id="whereArticle">
+	<where>1=1
+	<if test="status != null">
+		and article_status=#{status}
+	</if>
+	<if test="post != null">
+	  and article_post=#{post}
+	</if>
+	<if test="userId != null">
+		and user_id=#{userId}
+	</if>
+	</where>
+	</sql>
+	<sql id="whereArticleCustom">
+	<where>1=1
+	<if test="articleStatus != null">
+		and article_status=#{articleStatus}
+	</if>
+	<if test="articlePost != null">
+	  and article_post=#{articlePost}
+	</if>
+	<if test="userId != null">
+		and user_id=#{userId}
+	</if>
+	</where>
+	</sql>
+	<!-- <select id="findPageArticle"
+		resultType="ArticleCustom" parameterType="ArticleCustom">
+		SELECT *,(SELECT GROUP_CONCAT(sys_category.category_name) from
+		sys_category where category_id in(SELECT category_id FROM
+		sys_article_category WHERE article_id=a.id) ) categorysName
+		,(SELECT GROUP_CONCAT(sys_tag.tag_name) FROM sys_tag
+		WHERE tag_id in (SELECT tag_id FROM sys_article_tag WHERE
+		article_id = a.id)) tagsName,
+		(SELECT GROUP_CONCAT(sys_tag.tag_url) FROM sys_tag
+		WHERE tag_id in (SELECT tag_id FROM sys_article_tag WHERE
+		article_id = a.id)) tagsUrl,
+		(SELECT GROUP_CONCAT(sys_category.category_url) from
+		sys_category where category_id in(SELECT category_id FROM
+		sys_article_category WHERE article_id=a.id) ) categorysUrl
+		FROM sys_article a 
+		<include refid="whereArticleCustom"></include>
+		ORDER BY article_updatetime DESC,article_newstime DESC
+	</select> -->
+	<select id="findPageArticle"
+			resultType="com.lixy.model.domain.ArticleCustom" parameterType="com.lixy.model.domain.ArticleCustom">
+			SELECT
+			ma.*,
+			GROUP_CONCAT(distinct mc.category_name ) AS categorysName,
+			GROUP_CONCAT(distinct mc.category_url ) AS categorysUrl,
+			GROUP_CONCAT(distinct mt.tag_name ) AS tagsName,
+			GROUP_CONCAT(distinct mt.tag_url ) AS tagsUrl
+			FROM
+			sys_article ma
+			LEFT JOIN sys_article_category mac ON ma.id = mac.article_id
+			LEFT JOIN sys_category mc ON mc.category_id = mac.category_id
+			LEFT JOIN sys_article_tag mat ON ma.id = mat.article_id
+			LEFT JOIN sys_tag mt ON mt.tag_id = mat.tag_id
+			<include refid="whereArticleCustom"></include>
+			GROUP BY
+			ma.id ORDER BY article_updatetime DESC,article_newstime DESC
+	</select>
+	<select id="findAllArticle"
+		resultType="com.lixy.model.domain.ArticleCustom">
+		SELECT * FROM sys_article a 
+		<include refid="whereArticle"></include>
+	</select>
+
+	<select id="countByStatus" resultType="integer">
+		SELECT COUNT(*) FROM sys_article
+		<include refid="whereArticle"></include>
+	</select>
+	
+	<update id="updateStatus" parameterType="int">
+	update sys_article set article_status=#{status} where id = #{id}
+	</update>
+	
+	<select id="findByArticleId" resultType="com.lixy.model.domain.ArticleCustom" parameterType="Integer">
+	SELECT a.id,a.user_id,a.article_content,a.article_content_md,a.article_newstime,a.article_summary,a.article_thumbnail,a.article_title,article_type,a.article_comment,a.article_url,GROUP_CONCAT(distinct  b.category_id) categorys ,GROUP_CONCAT(distinct  c.tag_id) tags FROM sys_article a INNER JOIN sys_article_category b INNER JOIN sys_article_tag c on a.id=b.article_id AND b.article_id=c.article_id WHERE a.id=#{id}
+	</select>
+	
+	<select id="findDateAndCount" resultType="com.lixy.model.dto.ArchiveBo">
+	select DATE_FORMAT(article_newstime, '%Y年%m月') as date, count(*) as count from sys_article
+	where article_post = 'post' and article_status = 0
+	group by date order by date desc
+	</select>
+	
+	<select id="findRepeatByUrl" parameterType="String" resultType="Integer">
+	SELECT COUNT(*) FROM sys_article WHERE article_url = #{articleUrl}
+	</select>
+	<select id="findByArticleUrl" parameterType="String" resultType="com.lixy.model.domain.ArticleCustom">
+		SELECT
+			ma.*,
+			GROUP_CONCAT(distinct mc.category_name ) AS categorysName,
+			GROUP_CONCAT(distinct mc.category_url ) AS categorysUrl,
+			GROUP_CONCAT(distinct mt.tag_name ) AS tagsName,
+			GROUP_CONCAT(distinct mt.tag_url ) AS tagsUrl
+			FROM
+			sys_article ma
+			LEFT JOIN sys_article_category mac ON ma.id = mac.article_id
+			LEFT JOIN sys_category mc ON mc.category_id = mac.category_id
+			LEFT JOIN sys_article_tag mat ON ma.id = mat.article_id
+			LEFT JOIN sys_tag mt ON mt.tag_id = mat.tag_id
+			WHERE article_url=#{articleUrl}
+			GROUP BY ma.id 
+	</select>
+	
+	<select id="findArtileByCategory" resultType="com.lixy.model.domain.ArticleCustom">
+	SELECT * FROM sys_article WHERE id in 
+	(SELECT article_id FROM sys_article_category WHERE 
+	category_id=(SELECT category_id FROM sys_category WHERE category_url=#{category.categoryUrl})) and article_status =#{status}
+	</select>
+	
+	<select id="findArtileByTag" resultType="com.lixy.model.domain.ArticleCustom">
+	SELECT * FROM sys_article WHERE id in 
+	(SELECT article_id FROM sys_article_tag WHERE 
+	tag_id=(SELECT tag_id FROM sys_tag WHERE tag_url=#{tag.tagUrl})) and article_status =#{status}
+	</select>
+</mapper>
